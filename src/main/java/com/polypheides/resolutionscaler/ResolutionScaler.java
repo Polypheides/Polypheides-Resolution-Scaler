@@ -3,6 +3,7 @@ package com.polypheides.resolutionscaler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,12 +23,38 @@ public class ResolutionScaler implements ClientModInitializer {
 
     public static OptionInstance<Double> RESOLUTION_OPTION;
 
+    // Our dedicated low-res canvas for the 3D world
+    public static RenderTarget scaledRenderTarget;
+
     public static int scale(int value, double scaleFactor) {
-        return (int) Math.round(value * scaleFactor);
+        return Math.max(1, (int) Math.round(value * scaleFactor));
     }
 
     public static int scale(int value) {
         return scale(value, SCALE);
+    }
+
+    public static void resizeTarget() {
+        Minecraft client = Minecraft.getInstance();
+        if (client != null && client.getWindow() != null) {
+            int w = client.getWindow().getWidth();
+            int h = client.getWindow().getHeight();
+            int scaledW = scale(w);
+            int scaledH = scale(h);
+
+            if (scaledRenderTarget == null && client.level != null) {
+                scaledRenderTarget = new com.mojang.blaze3d.pipeline.TextureTarget(
+                        "ResolutionScaler",
+                        scaledW,
+                        scaledH,
+                        com.mojang.renderpearl.api.GpuFormat.RGBA8_UNORM,
+                        com.mojang.renderpearl.api.GpuFormat.D24_UNORM_S8_UINT);
+            } else if (scaledRenderTarget != null
+                    && (scaledRenderTarget.width != scaledW || scaledRenderTarget.height != scaledH)) {
+                // In modern versions, resize takes (width, height)
+                scaledRenderTarget.resize(scaledW, scaledH);
+            }
+        }
     }
 
     @Override
@@ -54,27 +81,17 @@ public class ResolutionScaler implements ClientModInitializer {
                 (newValue) -> {
                     SCALE = newValue.floatValue();
                     saveConfig();
-                    Minecraft client = Minecraft.getInstance();
-                    if (client != null && client.getWindow() != null && client.gameRenderer != null) {
-                        client.gameRenderer.resize(client.getWindow().getWidth(), client.getWindow().getHeight());
+                    if (Minecraft.getInstance().level != null) {
+                        resizeTarget();
                     }
                 });
 
         System.out.println("Polypheides Resolution Scaler initialized with SCALE: " + SCALE);
 
-        // HACK: Force a full render pipeline re-init on the first client tick.
-        // This fixes broken 3D scaling when launching in windowed/non-maximized mode.
-        boolean[] needsNudge = { true };
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (needsNudge[0] && client.gameRenderer != null && client.getWindow() != null) {
-                needsNudge[0] = false;
-                float saved = SCALE;
-                // Nudge: +1% normally, -1% if at max (200%)
-                SCALE = saved >= 2.0f ? saved - 0.01f : saved + 0.01f;
-                client.gameRenderer.resize(client.getWindow().getWidth(), client.getWindow().getHeight());
-                // Restore saved value
-                SCALE = saved;
-                client.gameRenderer.resize(client.getWindow().getWidth(), client.getWindow().getHeight());
+            // Ensure target exists, but only when we are actually in a world!
+            if (scaledRenderTarget == null && client.level != null) {
+                resizeTarget();
             }
         });
     }
