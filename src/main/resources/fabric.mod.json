@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "resolutionscaler",
+  "version": "${version}",
+  "name": "Polypheides Resolution Scaler",
+  "description": "Hack in resolution scaling for Vulkan SDL3",
+  "authors": [
+    "Polypheides"
+  ],
+  "contact": {},
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/resolutionscaler/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.polypheides.resolutionscaler.ResolutionScaler"
+    ]
+  },
+  "mixins": [
+    "resolutionscaler.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.3-alpha.4",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

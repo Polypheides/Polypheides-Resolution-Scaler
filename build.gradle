@@ -1,0 +1,75 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version '1.15.+'
+	id 'maven-publish'
+	id "com.modrinth.minotaur" version "2.8.7"
+}
+
+repositories {
+	mavenLocal()
+	maven { url = 'https://maven.fabricmc.net/' }
+	maven { url = 'https://maven.terraformersmc.com/releases/'
+		content { includeGroupAndSubgroups("com.terraformersmc")}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+
+	implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+
+	// Fabric API
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+base {
+	group = project.group
+	archivesName = project.mod_file_name
+	version = project.mod_version
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = "UTF-8"
+	it.options.release = 25
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+tasks.register('copyToPrism', Copy) {
+	from layout.buildDirectory.dir("libs")
+	if (project.hasProperty('local_mods_path_latest')) {
+		into project.findProperty('local_mods_path_latest')
+	} else {
+		enabled = false
+	}
+	include "*.jar"
+	exclude "*-sources.jar", "*-dev.jar"
+}
+
+// Make sure the copy runs when build is executed
+build.finalizedBy(copyToPrism)
+
+afterEvaluate {
+	modrinth {
+		token = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN") ?: ""
+		projectId = project.findProperty("MODRINTH_PROJECT_ID") ?: ""
+		versionNumber = project.mod_version
+		versionType = "release"
+		uploadFile = tasks.named("jar")
+		gameVersions = [project.minecraft_version]
+		loaders = ["fabric"]
+		dependencies {
+			required.project "fabric-api"
+		}
+	}
+}
