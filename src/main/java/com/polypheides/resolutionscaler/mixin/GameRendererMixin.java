@@ -1,33 +1,45 @@
 package com.polypheides.resolutionscaler.mixin;
 
 import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.polypheides.resolutionscaler.ResolutionScaler;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
+    @Mutable
     @Shadow
     private RenderTarget mainRenderTarget;
 
-    /**
-     * Prevents resize() from firing every frame.
-     * Since our mainRenderTarget width/height is scaled, it no longer matches the raw windowRenderState,
-     * causing Vanilla to trigger a resize every tick.
-     * We cache the last raw window dimensions and only resize when the window actually changes.
-     */
-    private int lastResizedForWidth = -1;
-    private int lastResizedForHeight = -1;
+    private RenderTarget nativeTarget;
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;resize(II)V"))
-    private void redirectResizeInRender(GameRenderer instance, int width, int height) {
-        if (width != lastResizedForWidth || height != lastResizedForHeight) {
-            lastResizedForWidth = width;
-            lastResizedForHeight = height;
-            instance.resize(width, height);
+    @Inject(method = "renderLevel", at = @At("HEAD"))
+    private void onRenderLevelHead(CallbackInfo ci) {
+        if (ResolutionScaler.scaledRenderTarget != null) {
+            this.nativeTarget = this.mainRenderTarget;
+            this.mainRenderTarget = ResolutionScaler.scaledRenderTarget;
+        }
+    }
+
+    @Inject(method = "renderLevel", at = @At("RETURN"))
+    private void onRenderLevelReturn(CallbackInfo ci) {
+        if (ResolutionScaler.scaledRenderTarget != null && this.nativeTarget != null) {
+            // Restore the native high-res target for the UI
+            this.mainRenderTarget = this.nativeTarget;
+
+            // In Minecraft 26.3, blitAndBlendToTexture(dstColor, dstDepth) blits THIS
+            // texture to the arguments.
+            // So we call it on the scaled target, passing the native target's textures as
+            // the destination!
+            ResolutionScaler.scaledRenderTarget.blitAndBlendToTexture(
+                    java.util.Objects.requireNonNull(this.mainRenderTarget.getColorTextureView()),
+                    java.util.Objects.requireNonNull(this.mainRenderTarget.getDepthTextureView()));
         }
     }
 }
