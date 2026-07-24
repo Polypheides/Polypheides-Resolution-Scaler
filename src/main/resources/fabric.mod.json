@@ -14,6 +14,9 @@
   "entrypoints": {
     "client": [
       "com.polypheides.resolutionscaler.ResolutionScaler"
+    ],
+    "sodium:config_api_user": [
+      "com.polypheides.resolutionscaler.integration.PrsSodiumConfig"
     ]
   },
   "mixins": [
@@ -23,6 +26,6 @@
     "fabricloader": ">=0.19.3",
     "minecraft": "~26.3-alpha.4",
     "java": ">=25",
-    "fabric-api": "*"
+    "fabric-api": ">=0.155.1+26.3"
   }
 }
