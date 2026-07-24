@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -47,8 +48,8 @@ public class ResolutionScaler implements ClientModInitializer {
                         "ResolutionScaler",
                         scaledW,
                         scaledH,
-                        com.mojang.renderpearl.api.GpuFormat.RGBA8_UNORM,
-                        com.mojang.renderpearl.api.GpuFormat.D24_UNORM_S8_UINT);
+                        true,
+                        com.mojang.blaze3d.GpuFormat.RGBA8_UNORM);
             } else if (scaledRenderTarget != null
                     && (scaledRenderTarget.width != scaledW || scaledRenderTarget.height != scaledH)) {
                 // In modern versions, resize takes (width, height)
@@ -92,6 +93,13 @@ public class ResolutionScaler implements ClientModInitializer {
             // Ensure target exists, but only when we are actually in a world!
             if (scaledRenderTarget == null && client.level != null) {
                 resizeTarget();
+            }
+        });
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            if (scaledRenderTarget != null) {
+                scaledRenderTarget.destroyBuffers();
+                scaledRenderTarget = null;
             }
         });
     }
