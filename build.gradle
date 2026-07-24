@@ -7,6 +7,7 @@ plugins {
 repositories {
 	mavenLocal()
 	maven { url = 'https://maven.fabricmc.net/' }
+	maven { url = 'https://api.modrinth.com/maven' }
 	maven { url = 'https://maven.terraformersmc.com/releases/'
 		content { includeGroupAndSubgroups("com.terraformersmc")}
 	}
@@ -19,6 +20,9 @@ dependencies {
 
 	// Fabric API
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// Sodium integration (compile-only so it's optional at runtime)
+	compileOnly "maven.modrinth:sodium:mc26.2-0.9.1-fabric"
 }
 
 base {
@@ -70,6 +74,7 @@ afterEvaluate {
 		loaders = ["fabric"]
 		dependencies {
 			required.project "fabric-api"
+			optional.project "sodium"
 		}
 	}
 }
