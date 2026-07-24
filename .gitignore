@@ -7,3 +7,5 @@ decompiled/
 *.iml
 *.class
 run/
+scratch/
+/assets/
