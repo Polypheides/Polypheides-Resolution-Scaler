@@ -4,7 +4,7 @@ import com.polypheides.resolutionscaler.ResolutionScaler;
 import net.caffeinemc.mods.sodium.api.config.ConfigEntryPoint;
 import net.caffeinemc.mods.sodium.api.config.structure.ConfigBuilder;
 import net.caffeinemc.mods.sodium.api.config.option.OptionImpact;
-import net.caffeinemc.mods.sodium.client.gui.options.control.ControlValueFormatterImpls;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 
@@ -28,7 +28,16 @@ public class PrsSodiumConfig implements ConfigEntryPoint {
                     .setDefaultValue(100)
                     .setImpact(OptionImpact.HIGH)
                     .setStorageHandler(ResolutionScaler::saveConfig)
-                    .setValueFormatter(ControlValueFormatterImpls.percentage())
+                    .setValueFormatter((value) -> {
+                        int w = 1920;
+                        int h = 1080;
+                        net.minecraft.client.Minecraft client = net.minecraft.client.Minecraft.getInstance();
+                        if (client != null && client.getWindow() != null) {
+                            w = client.getWindow().getWidth();
+                            h = client.getWindow().getHeight();
+                        }
+                        return Component.literal(value + "% (" + ResolutionScaler.scale(w, value / 100.0) + "x" + ResolutionScaler.scale(h, value / 100.0) + ")");
+                    })
                     .setBinding(
                         // Setter
                         (value) -> {
