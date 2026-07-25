@@ -50,10 +50,16 @@ public class ResolutionScaler implements ClientModInitializer {
                         scaledH,
                         true,
                         com.mojang.blaze3d.GpuFormat.RGBA8_UNORM);
+                if (client.gameRenderer != null && client.gameRenderer.gameRenderState() != null) {
+                    client.gameRenderer.gameRenderState().levelRenderState.shouldResetSkyRenderer = true;
+                }
             } else if (scaledRenderTarget != null
                     && (scaledRenderTarget.width != scaledW || scaledRenderTarget.height != scaledH)) {
                 // In modern versions, resize takes (width, height)
                 scaledRenderTarget.resize(scaledW, scaledH);
+                if (client.gameRenderer != null && client.gameRenderer.gameRenderState() != null) {
+                    client.gameRenderer.gameRenderState().levelRenderState.shouldResetSkyRenderer = true;
+                }
             }
         }
     }
