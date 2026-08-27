@@ -14,16 +14,7 @@ public class SkyRendererMixin {
      * Redirects internal field accesses to `this.renderTarget` inside SkyRenderer
      * to ensure it always renders into the currently active main render target.
      */
-    @Redirect(method = {
-            "renderSkyDisc",
-            "renderDarkDisc",
-            "renderSun",
-            "renderMoon",
-            "renderStars",
-            "renderSunriseAndSunset",
-            "renderEndSky",
-            "renderEndFlash"
-    }, at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderTarget:Lcom/mojang/blaze3d/pipeline/RenderTarget;", opcode = org.objectweb.asm.Opcodes.GETFIELD))
+    @Redirect(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderTarget:Lcom/mojang/blaze3d/pipeline/RenderTarget;", opcode = org.objectweb.asm.Opcodes.GETFIELD))
     private RenderTarget redirectGetRenderTarget(SkyRenderer instance) {
         return Minecraft.getInstance().gameRenderer.mainRenderTarget();
     }

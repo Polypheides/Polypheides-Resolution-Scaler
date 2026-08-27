@@ -4,7 +4,7 @@ A Fabric mod for Minecraft 26.3-snapshot-4 that adds a fully dynamic Render Scal
 
 ## Features
 - **Dynamic Render Scaling**: Allows you to adjust the 3D rendering resolution independently of the window size, upscaling up to 200% (Supersampling) or downscaling down to 10% (for potential performance gains on GPU-bound systems).
-- **Cross-Backend Compatibility**: Works flawlessly with both the OpenGL and Vulkan (`RenderPearl`) rendering backends.
+- **Cross-Backend Compatibility**: Should work with both the OpenGL and Vulkan rendering backends.
 - **On-the-Fly Adjustments**: Change the scale factor in-game without needing to restart.
 
 ## Installation
