@@ -3,7 +3,7 @@
   "id": "resolutionscaler",
   "version": "${version}",
   "name": "Polypheides Resolution Scaler",
-  "description": "Hack in resolution scaling for Vulkan SDL3",
+  "description": "Adds a resolution scale slider to Video Settings, allowing you to render at a lower internal resolution.",
   "authors": [
     "Polypheides"
   ],
@@ -24,8 +24,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.19.3",
-    "minecraft": "~26.3-alpha.4",
+    "minecraft": "~26.3-beta.1",
     "java": ">=25",
-    "fabric-api": ">=0.155.1+26.3"
+    "fabric-api": ">=0.159.1+26.3"
   }
 }

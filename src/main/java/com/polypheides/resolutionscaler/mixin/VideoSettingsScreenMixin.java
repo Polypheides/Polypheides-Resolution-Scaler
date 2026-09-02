@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class VideoSettingsScreenMixin {
 
     @Inject(method = "displayOptions", at = @At("RETURN"), cancellable = true)
-    private static void injectResolutionOption(Options options, boolean bl, CallbackInfoReturnable<OptionInstance<?>[]> cir) {
+    private static void injectResolutionOption(Options options, CallbackInfoReturnable<OptionInstance<?>[]> cir) {
         OptionInstance<?>[] original = cir.getReturnValue();
         if (original != null) {
             OptionInstance<?>[] modified = new OptionInstance<?>[original.length + 1];
