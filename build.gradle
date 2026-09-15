@@ -22,8 +22,18 @@ dependencies {
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Sodium integration (compile-only so it's optional at runtime)
-	// compileOnly "maven.modrinth:sodium:mc26.2-0.9.1-fabric"
+	compileOnly "maven.modrinth:sodium:mc26.3-0.9.2-fabric"
 }
+
+// Exclude Sodium integration when compiling without the Sodium dependency.
+// Uncomment this block when compiling without Sodium support:
+// sourceSets {
+// 	main {
+// 		java {
+// 			exclude '**/integration/**'
+// 		}
+// 	}
+// }
 
 base {
 	group = project.group
@@ -74,7 +84,7 @@ afterEvaluate {
 		loaders = ["fabric"]
 		dependencies {
 			required.project "fabric-api"
-			// optional.project "sodium"
+			optional.project "sodium"
 		}
 	}
 }

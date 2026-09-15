@@ -15,7 +15,7 @@
     "client": [
       "com.polypheides.resolutionscaler.ResolutionScaler"
     ],
-    "__disabled_sodium:config_api_user": [
+    "sodium:config_api_user": [
       "com.polypheides.resolutionscaler.integration.PrsSodiumConfig"
     ]
   },
