@@ -26,14 +26,14 @@ dependencies {
 }
 
 // Exclude Sodium integration when compiling without the Sodium dependency.
-// Uncomment this block when compiling without Sodium support:
-// sourceSets {
-// 	main {
-// 		java {
-// 			exclude '**/integration/**'
-// 		}
-// 	}
-// }
+// Comment this out when compiling with Sodium support enabled.
+sourceSets {
+	main {
+		java {
+			exclude '**/integration/**'
+		}
+	}
+}
 
 base {
 	group = project.group
@@ -78,13 +78,13 @@ afterEvaluate {
 		token = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN") ?: ""
 		projectId = project.findProperty("MODRINTH_PROJECT_ID") ?: ""
 		versionNumber = project.mod_version
-		versionType = "release"
+		versionType = "alpha"
 		uploadFile = tasks.named("jar")
 		gameVersions = [project.minecraft_version]
 		loaders = ["fabric"]
 		dependencies {
 			required.project "fabric-api"
-			optional.project "sodium"
+			// optional.project "sodium"
 		}
 	}
 }

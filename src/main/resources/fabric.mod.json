@@ -15,7 +15,7 @@
     "client": [
       "com.polypheides.resolutionscaler.ResolutionScaler"
     ],
-    "sodium:config_api_user": [
+    "__disabled_sodium:config_api_user": [
       "com.polypheides.resolutionscaler.integration.PrsSodiumConfig"
     ]
   },
@@ -24,8 +24,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.19.3",
-    "minecraft": "~26.3-beta.1",
+    "minecraft": "~26.4-",
     "java": ">=25",
-    "fabric-api": ">=0.159.1+26.3"
+    "fabric-api": ">=0.161.1+26.4"
   }
 }
